@@ -1,7 +1,7 @@
 // src/inngest/client.ts
 import { Inngest } from "inngest";
 import connectDB from "./db";
-import User from "../models/user";
+import User from "../models/User";
 
 export const inngest = new Inngest({ id: "store_tech-next" });
 
