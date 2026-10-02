@@ -3,7 +3,6 @@ import { Inngest } from "inngest";
 import connectDB from "./db";
 import user from "../models/user";
 
-
 export const inngest = new Inngest({ id: "store_tech-next" });
 
 export const synUserCreation = inngest.createFunction(
@@ -17,8 +16,8 @@ export const synUserCreation = inngest.createFunction(
       event.data;
     const userData = {
       _id: id,
-      email: email_addresses[0].email_addresses,
-      name: first_name + " " + last_name,
+      email: email_addresses[0].email_address,
+      name: `${first_name} ${last_name}`,
       imageUrl: image_url,
     };
     await connectDB();
@@ -36,12 +35,12 @@ export const syncUserUpdation = inngest.createFunction(
       event.data;
     const userData = {
       _id: id,
-      email: email_addresses[0].email_addresses,
-      name: first_name + " " + last_name,
+      email: email_addresses[0].email_address,
+      name: `${first_name} ${last_name}`,
       imageUrl: image_url,
     };
     await connectDB();
-    await User.findByIdAndUpdate(id, userData);
+    await user.findByIdAndUpdate(id, userData);
   }
 );
 
