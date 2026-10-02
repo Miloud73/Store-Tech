@@ -1,7 +1,7 @@
 // src/inngest/client.ts
 import { Inngest } from "inngest";
 import connectDB from "./db";
-import user from "../models/user";
+import User from "../models/User";
 
 export const inngest = new Inngest({ id: "store_tech-next" });
 
@@ -21,7 +21,7 @@ export const synUserCreation = inngest.createFunction(
       imageUrl: image_url,
     };
     await connectDB();
-    await user.create(userData);
+    await User.create(userData);
   }
 );
 
@@ -40,7 +40,7 @@ export const syncUserUpdation = inngest.createFunction(
       imageUrl: image_url,
     };
     await connectDB();
-    await user.findByIdAndUpdate(id, userData);
+    await User.findByIdAndUpdate(id, userData);
   }
 );
 
