@@ -14,17 +14,18 @@ async function connectDB() {
     return cached.conn;
   }
 
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-    };
+  if (!process.env.MONGODB_URI) {
+    throw new Error("MONGODB_URI is not defined");
+  }
 
-    cached.promise = mongoose
-      .connect(`${process.env.MONGODB_URI}/store_tech`, opts)
-      .then((mongoose) => mongoose);
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGODB_URI, {
+      bufferCommands: false,
+    });
   }
 
   cached.conn = await cached.promise;
+
   return cached.conn;
 }
 
