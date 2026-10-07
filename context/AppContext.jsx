@@ -17,7 +17,7 @@ export const useAppContext = () => {
 export const AppContextProvider = (props) => {
   const currency = process.env.NEXT_PUBLIC_CURRENCY;
   const router = useRouter();
-  const { user } = useUser();
+  const { user, isLoaded } = useUser();
 
   const { getToken } = useAuth();
 
@@ -32,14 +32,16 @@ export const AppContextProvider = (props) => {
 
   const fetchUserData = async () => {
     try {
-      if (user.publicMetadata.role == "seller") {
+      if (user?.publicMetadata?.role === "seller") {
         setIsSeller(true);
       }
 
       const token = await getToken();
 
+      console.log("Clerk token:", token);
+
       const { data } = await axios.get("/api/user/data", {
-        headers: { Authorization: `Bearer${token}` },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       if (data.success) {
@@ -49,6 +51,7 @@ export const AppContextProvider = (props) => {
         toast.error(data.message);
       }
     } catch (error) {
+      console.error("fetchUserData error:", error);
       toast.error(error.message);
     }
   };
@@ -99,10 +102,10 @@ export const AppContextProvider = (props) => {
   }, []);
 
   useEffect(() => {
-    if (user) {
+    if (isLoaded && user) {
       fetchUserData();
     }
-  }, [user]);
+  }, [isLoaded, user]);
 
   const value = {
     user,
