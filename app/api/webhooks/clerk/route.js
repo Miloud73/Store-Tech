@@ -7,7 +7,7 @@ export async function POST(req) {
     console.log("Clerk webhook received:", event.type);
 
     await inngest.send({
-      name: event.type,
+      name: `clerk/${event.type}`,
       data: event.data,
     });
 
@@ -16,10 +16,7 @@ export async function POST(req) {
     console.error("Clerk webhook error:", error);
 
     return Response.json(
-      {
-        success: false,
-        message: error.message,
-      },
+      { success: false, message: error.message },
       { status: 500 }
     );
   }
