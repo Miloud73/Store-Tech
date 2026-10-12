@@ -1,11 +1,15 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
-import { productsDummyData, userDummyData } from "@/assets/assets";
+import { productsDummyData } from "@/assets/assets";
 import { useAuth, useUser } from "@clerk/nextjs";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import toast from "react-hot-toast";
 
 export const AppContext = createContext();
@@ -21,7 +25,7 @@ export const AppContextProvider = (props) => {
 
   const { getToken } = useAuth();
 
-  const [products, setProducts] = useState(productsDummyData);
+  const [products, setProducts] = useState(() => productsDummyData);
   const [userData, setUserData] = useState(false);
   const [isSeller, setIsSeller] = useState(false);
   const [cartItems, setCartItems] = useState({});
@@ -30,14 +34,13 @@ export const AppContextProvider = (props) => {
     setProducts(productsDummyData);
   };
 
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
+      const token = await getToken();
+
       if (user?.publicMetadata?.role === "seller") {
         setIsSeller(true);
       }
-
-      const token = await getToken();
-
       console.log("Clerk token:", token);
 
       const { data } = await axios.get("/api/user/data", {
@@ -54,7 +57,7 @@ export const AppContextProvider = (props) => {
       console.error("fetchUserData error:", error);
       toast.error(error.message);
     }
-  };
+  }, [getToken, user]);
 
   const addToCart = async (itemId) => {
     let cartData = structuredClone(cartItems);
@@ -98,14 +101,26 @@ export const AppContextProvider = (props) => {
   };
 
   useEffect(() => {
-    fetchProductData();
-  }, []);
+    if (!isLoaded || !user) return;
 
-  useEffect(() => {
-    if (isLoaded && user) {
-      fetchUserData();
-    }
-  }, [isLoaded, user]);
+    let isActive = true;
+
+    const loadUserData = async () => {
+      try {
+        await fetchUserData();
+      } finally {
+        if (isActive) {
+          isActive = false;
+        }
+      }
+    };
+
+    void loadUserData();
+
+    return () => {
+      isActive = false;
+    };
+  }, [isLoaded, user, fetchUserData]);
 
   const value = {
     user,
