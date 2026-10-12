@@ -2,6 +2,7 @@ import { getAuth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
 import authSeller from "../../../../lib/authSeller";
+import Product from "../../../../models/Product";
 
 // configure cloudinary
 cloudinary.config({
@@ -59,10 +60,23 @@ export async function POST(request) {
     );
 
     const image = result.map((res) => res.secure_url);
-    
+    await connectTDB();
+    const newProduct=await Product.create({
+      userId,
+      name,
+      description,
+      price,
+      offerPrice,
+      category,
+      images: image,
+      date: new Date(),
+
+    });
+
+    return NextResponse.json({ success: true, product: 'upload successful' , newProduct });
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: "Failed to add product." },
+      { success: false, message: error.message || "An error occurred while adding the product." },
       { status: 500 }
     );
   }
