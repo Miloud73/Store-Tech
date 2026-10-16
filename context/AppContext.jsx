@@ -38,7 +38,7 @@ export const AppContextProvider = (props) => {
     try {
       const token = await getToken();
 
-      if (user?.publicMetadata?.role === "seller") {
+      if (user?.publicMetadata?.role == "seller") {
         setIsSeller(true);
       }
       // console.log("Clerk token:", token);

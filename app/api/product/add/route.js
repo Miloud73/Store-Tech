@@ -1,8 +1,9 @@
-import { getAuth } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse } from "next/server";
 import authSeller from "../../../../lib/authSeller";
 import Product from "../../../../models/Product";
+import connectTDB from "../../../../config/db";
 
 // configure cloudinary
 cloudinary.config({
@@ -13,16 +14,31 @@ cloudinary.config({
 
 export async function POST(request) {
   try {
-    const { userId } = getAuth(request);
+    const { userId } = await auth();
+
+    // Check authentication first
+    if (!userId) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "You must be logged in.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Check seller authorization
     const isSeller = await authSeller(userId);
 
     if (!isSeller) {
       return NextResponse.json(
-        { success: false, message: "Unauthorized access. Only sellers can add products." },
+        {
+          success: false,
+          message: "Unauthorized access. Only sellers can add products.",
+        },
         { status: 403 }
       );
     }
-
     const formData = await request.formData();
     const name = formData.get("name");
     const description = formData.get("description");

@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import { useAppContext } from "@/context/AppContext";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import axios from "axios";
 
 const AddProduct = () => {
@@ -26,34 +26,68 @@ const AddProduct = () => {
     formData.append("price", price);
     formData.append("offerPrice", offerPrice);
 
-    for (let index = 0; index < files.length; index++) {
-      formData.append("images", files[index]);
-    }
+    files.forEach((file) => {
+      if (file instanceof File) {
+        formData.append("images", file);
+      }
+    });
 
     try {
       const token = await getToken();
       const { data } = await axios.post("/api/product/add", formData, {
         headers: { Authorization: "Bearer " + token },
       });
-      console.log("that is your data", data);
-      if (data.success) {
-        toast.success(data.message);
+      if (!data.success) {
+        toast.error(data.message || "Failed to add product.");
+        return;
+      } else {
+        toast.success(data.message || "Product added successfully!");
         setFiles([]);
         setName("");
         setDescription("");
         setCategory("Earphone");
         setPrice("");
         setOfferPrice("");
-      } else {
-        toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Add product error:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "An error occurred while adding the product."
+      );
     }
   };
 
   return (
     <div className="flex-1 min-h-screen flex flex-col justify-between">
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#1f2937",
+            color: "#ffffff",
+            borderRadius: "10px",
+            padding: "14px 16px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#22c55e",
+              secondary: "#ffffff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#ffffff",
+            },
+          },
+        }}
+      />
+
       <form onSubmit={handleSubmit} className="md:p-10 p-4 space-y-5 max-w-lg">
         <div>
           <p className="text-base font-medium">Product Image</p>
