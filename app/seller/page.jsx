@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { assets } from "@/assets/assets";
 import Image from "next/image";
 import {useAppContext} from "@/context/AppContext";
+import toast from "react-hot-toast";
 
 const AddProduct = () => {
 
@@ -17,6 +18,38 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const formData = new FormData();
+    formData.append('name' , name)
+    formData.append('description' , description)
+    formData.append('category' , category)
+    formData.append('price' , price)
+    formData.append('offerPrice' , offerPrice)
+
+    for (let index = 0; index < files.length; index++) {
+      formData.append('images', files[index]);
+    }
+
+    try {
+      const token = await getToken();
+      const {data} = await axios.post('/api/product/add',formData,{ headers: {'Authorization' : 'Bearer ' + token}});
+      console.log('that is your data' , data)
+      if (data.success) {
+       toast.success(data.message)
+       setFiles([]);
+        setName('');
+        setDescription('');
+        setCategory('Earphone');
+        setPrice('');
+        setOfferPrice('');
+      }else{
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+
+      
+    }
 
   };
 
@@ -127,7 +160,7 @@ const AddProduct = () => {
             />
           </div>
         </div>
-        <button type="submit" className="px-8 py-2.5 bg-orange-600 text-white font-medium rounded">
+        <button  type="submit" className="px-8 cursor-pointer py-2.5 bg-orange-600 text-white font-medium rounded">
           ADD
         </button>
       </form>
