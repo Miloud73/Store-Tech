@@ -9,6 +9,8 @@ import axios from "axios";
 const AddProduct = () => {
   const { getToken } = useAppContext();
 
+  const [isLoading, setIsLoading] = useState(false);
+
   const [files, setFiles] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -18,6 +20,10 @@ const AddProduct = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isLoading) return;
+
+    setIsLoading(true);
 
     const formData = new FormData();
     formData.append("name", name);
@@ -57,7 +63,9 @@ const AddProduct = () => {
           error.message ||
           "An error occurred while adding the product."
       );
-    }
+    }finally {
+    setIsLoading(false);
+  }
   };
 
   return (
@@ -202,9 +210,18 @@ const AddProduct = () => {
         </div>
         <button
           type="submit"
-          className="px-8 cursor-pointer py-2.5 bg-orange-600 text-white font-medium rounded"
+          disabled={isLoading}
+          className={`px-8 py-2.5 rounded font-medium text-white flex items-center justify-center gap-2 ${
+            isLoading
+              ? "bg-orange-400 cursor-not-allowed"
+              : "bg-orange-600 hover:bg-orange-700 cursor-pointer"
+          }`}
         >
-          ADD
+          {isLoading && (
+            <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+          )}
+
+          {isLoading ? "Uploading..." : "ADD"}
         </button>
       </form>
       {/* <Footer /> */}
