@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useState } from "react";
+import React from "react";
+import { useState } from "react";
 import { assets } from "@/assets/assets";
 import ProductCard from "@/components/ProductCard";
 import Navbar from "@/components/Navbar";
@@ -8,7 +9,6 @@ import Image from "next/image";
 import { useParams } from "next/navigation";
 import Loading from "@/components/Loading";
 import { useAppContext } from "@/context/AppContext";
-import React from "react";
 
 const Product = () => {
   const { id } = useParams();
@@ -16,16 +16,7 @@ const Product = () => {
   const { products, router, addToCart } = useAppContext();
 
   const [mainImage, setMainImage] = useState(null);
-  const [productData, setProductData] = useState(null);
-
-  const fetchProductData = async () => {
-    const product = products.find((product) => product._id === id);
-    setProductData(product);
-  };
-
-  useEffect(() => {
-    fetchProductData();
-  }, [id, products.length]);
+  const productData = products.find((product) => product._id === id);
 
   return productData ? (
     <>
@@ -33,7 +24,7 @@ const Product = () => {
       <div className="px-6 md:px-16 lg:px-32  pt-14 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
           <div className="px-5 lg:px-16 xl:px-20">
-            <div className="rounded-lg overflow-hidden bg-gray-500/10 mb-4">
+            <div className="rounded-lg overflow-hidden relative z-10 mb-4">
               <Image
                 src={mainImage || productData.image[0]}
                 alt="alt"
@@ -53,7 +44,7 @@ const Product = () => {
                   <Image
                     src={image}
                     alt="alt"
-                    className="w-full h-auto object-cover mix-blend-multiply"
+                    className="w-full h-auto object-cover  mix-blend-multiply"
                     width={1280}
                     height={720}
                   />

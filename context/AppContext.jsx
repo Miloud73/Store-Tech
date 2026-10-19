@@ -10,7 +10,7 @@ import {
   useEffect,
   useState,
 } from "react";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 
 export const AppContext = createContext();
 
@@ -76,6 +76,8 @@ export const AppContextProvider = (props) => {
       cartData[itemId] = 1;
     }
     setCartItems(cartData);
+
+    toast.success("Item added to cart");
   };
 
   const updateCartQuantity = async (itemId, quantity) => {
@@ -151,6 +153,33 @@ export const AppContextProvider = (props) => {
   };
 
   return (
-    <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+    <>
+      <Toaster
+        position="top-center"
+        reverseOrder={false}
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#1f2937",
+            color: "#ffffff",
+            borderRadius: "10px",
+            padding: "14px 16px",
+          },
+          success: {
+            iconTheme: {
+              primary: "#22c55e",
+              secondary: "#ffffff",
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: "#ef4444",
+              secondary: "#ffffff",
+            },
+          },
+        }}
+      />
+      <AppContext.Provider value={value}>{props.children}</AppContext.Provider>
+    </>
   );
 };
