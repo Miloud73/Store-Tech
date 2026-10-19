@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React from "react";
 import { assets } from "@/assets/assets";
 import OrderSummary from "@/components/OrderSummary";
@@ -7,8 +7,14 @@ import Navbar from "@/components/Navbar";
 import { useAppContext } from "@/context/AppContext";
 
 const Cart = () => {
-
-  const { products, router, cartItems, addToCart, updateCartQuantity, getCartCount } = useAppContext();
+  const {
+    products,
+    router,
+    cartItems,
+    addToCart,
+    updateCartQuantity,
+    getCartCount,
+  } = useAppContext();
 
   return (
     <>
@@ -19,7 +25,9 @@ const Cart = () => {
             <p className="text-2xl md:text-3xl text-[#E6E9F2]">
               Your <span className="font-medium text-orange-600">Cart</span>
             </p>
-            <p className="text-lg md:text-xl text-[#E6E9F2]/80">{getCartCount()} Items</p>
+            <p className="text-lg md:text-xl text-[#E6E9F2]/80">
+              <span className="text-orange-600">{getCartCount()}</span> Items
+            </p>
           </div>
           <div className="overflow-x-auto text-[#E6E9F2]">
             <table className="min-w-full table-auto">
@@ -49,11 +57,11 @@ const Cart = () => {
                     <tr key={itemId}>
                       <td className="flex items-center gap-4 py-4 md:px-4 px-1">
                         <div>
-                          <div className="rounded-lg overflow-hidden bg-gray-500/10 p-2">
+                          <div className="rounded-lg z-10 text-[#E6E9F2]/80 overflow-hidden bg-[#E6E9F2] p-2">
                             <Image
                               src={product.image[0]}
                               alt={product.name}
-                              className="w-16 h-auto object-cover mix-blend-multiply"
+                              className="w-16 h-auto  object-cover mix-blend-multiply"
                               width={1280}
                               height={720}
                             />
@@ -66,7 +74,7 @@ const Cart = () => {
                           </button>
                         </div>
                         <div className="text-sm hidden md:block">
-                          <p className="text-gray-800">{product.name}</p>
+                          <p className="text-[#E6E9F2]">{product.name}</p>
                           <button
                             className="text-xs text-orange-600 mt-1"
                             onClick={() => updateCartQuantity(product._id, 0)}
@@ -75,17 +83,36 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-[#E6E9F2]">${product.offerPrice}</td>
+                      <td className="py-4 md:px-4 px-1 text-[#E6E9F2]">
+                        ${product.offerPrice}
+                      </td>
                       <td className="py-4 md:px-4 px-1">
                         <div className="flex items-center md:gap-2 gap-1">
-                          <button onClick={() => updateCartQuantity(product._id, cartItems[itemId] - 1)}>
+                          <button
+                            onClick={() =>
+                              updateCartQuantity(
+                                product._id,
+                                cartItems[itemId] - 1
+                              )
+                            }
+                          >
                             <Image
                               src={assets.decrease_arrow}
                               alt="decrease_arrow"
                               className="w-4 h-4"
                             />
                           </button>
-                          <input onChange={e => updateCartQuantity(product._id, Number(e.target.value))} type="number" value={cartItems[itemId]} className="w-8 border text-center appearance-none"></input>
+                          <input
+                            onChange={(e) =>
+                              updateCartQuantity(
+                                product._id,
+                                Number(e.target.value)
+                              )
+                            }
+                            type="number"
+                            value={cartItems[itemId]}
+                            className="w-8 border text-center appearance-none"
+                          ></input>
                           <button onClick={() => addToCart(product._id)}>
                             <Image
                               src={assets.increase_arrow}
@@ -95,16 +122,21 @@ const Cart = () => {
                           </button>
                         </div>
                       </td>
-                      <td className="py-4 md:px-4 px-1 text-[#E6E9F2]">${(product.offerPrice * cartItems[itemId]).toFixed(2)}</td>
+                      <td className="py-4 md:px-4 px-1 text-[#E6E9F2]">
+                        ${(product.offerPrice * cartItems[itemId]).toFixed(2)}
+                      </td>
                     </tr>
                   );
                 })}
               </tbody>
             </table>
           </div>
-          <button onClick={()=> router.push('/all-products')} className="group flex items-center mt-6 gap-2 text-orange-600">
+          <button
+            onClick={() => router.push("/all-products")}
+            className="group flex items-center mt-6 gap-2 text-orange-600"
+          >
             <Image
-              className="group-hover:-translate-x-1 transition"
+              className="group-hover:-translate-x-1  transition"
               src={assets.arrow_right_icon_colored}
               alt="arrow_right_icon_colored"
             />
