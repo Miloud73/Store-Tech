@@ -58,7 +58,7 @@ export const AppContextProvider = (props) => {
 
       if (data.success) {
         setUserData(data.user);
-        setCartItems(data.user.cartItem);
+        setCartItems(data.user.cartItem || {});
       } else {
         toast.error(data.message);
       }
@@ -69,29 +69,48 @@ export const AppContextProvider = (props) => {
   }, [getToken, user]);
 
   const addToCart = async (itemId) => {
-    let cartData = structuredClone(cartItems);
-    if (cartData[itemId]) {
-      cartData[itemId] += 1;
-    } else {
-      cartData[itemId] = 1;
-    }
+    const previousCart = cartItems;
+    const cartData = { ...cartItems };
+
+    cartData[itemId] = (cartData[itemId] || 0) + 1;
+
+    // Update the UI immediately
     setCartItems(cartData);
 
-    toast.success("Item added to cart");
+    // Guests can use the local cart
+    if (!user) {
+      toast.success("Item added to cart");
+      return;
+    }
 
-    if (user) {
-      try {
-        const token = await getToken()
-        await axios.post('/api/cart/update', { cartData },{
-          headers:{
-            Authorization: `Bearer ${token}`
-          }
-        })
-        toast.success("Item updated in cart successfully");
-      } catch (error) {
+    try {
+      const token = await getToken();
 
-        toast.error(error.message);
+      const { data } = await axios.post(
+        "/api/cart/update",
+        { cartData },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!data.success) {
+        throw new Error(data.message || "Failed to update cart");
       }
+
+      // Show success only after the server confirms the update
+      toast.success("Item added to cart");
+    } catch (error) {
+      // Restore the previous cart if saving failed
+      setCartItems(previousCart);
+
+      toast.error(
+        error.response?.data?.message ||
+          error.message ||
+          "Failed to add item to cart"
+      );
     }
   };
 
@@ -106,12 +125,16 @@ export const AppContextProvider = (props) => {
 
     if (user) {
       try {
-        const token = await getToken()
-        await axios.post('/api/cart/update', {cartData},{
-          headers:{
-            Authorization: `Bearer ${token}`
+        const token = await getToken();
+        await axios.post(
+          "/api/cart/update",
+          { cartData },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
           }
-        })
+        );
         toast.success("Cart updated successfully");
       } catch (error) {
         toast.error("Failed to update cart: " + error.message);

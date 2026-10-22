@@ -1,24 +1,43 @@
+
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import connectDB from "@/config/db";
 import User from "@/models/User";
-export async function GET(request) {
+
+export async function GET() {
   try {
-    const { userId } = auth(request);
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized. Please sign in." },
+        { status: 401 }
+      );
+    }
 
     await connectDB();
 
     const user = await User.findById(userId);
-    const cartItems = user.cart;
 
-    return NextResponse(
-      JSON.stringify({ success: true, data: cartItems }),
-      { status: 200 }
-    );
+    if (!user) {
+      return NextResponse.json(
+        { success: false, message: "User not found." },
+        { status: 404 }
+      );
+    }
 
+    return NextResponse.json({
+      success: true,
+      cartItems: user.cartItem || {},
+    });
   } catch (error) {
-    return NextResponse(
-      JSON.stringify({ success: false, message: error.message }),
+    console.error("GET /api/cart/get error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Unable to fetch cart.",
+      },
       { status: 500 }
     );
   }
