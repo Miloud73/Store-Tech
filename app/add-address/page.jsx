@@ -4,8 +4,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import Image from "next/image";
 import { useState } from "react";
+import { useAppContext } from "@/context/AppContext";
+import axios from "axios";
+import toast from "react-hot-toast";
+
 
 const AddAddress = () => {
+  const { getToken, router } = useAppContext();
   const [address, setAddress] = useState({
     fullName: "",
     phoneNumber: "",
@@ -17,6 +22,28 @@ const AddAddress = () => {
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
+
+    try {
+      const token = await getToken();
+      const { data } = await axios.post(
+        "/api/user/add-address",
+        { address },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        router.push("/cart");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
 
   return (
@@ -30,7 +57,7 @@ const AddAddress = () => {
           </p>
           <div className="space-y-3 max-w-sm mt-10">
             <input
-              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-gray-500"
+              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-[#E6E9F2]/80"
               type="text"
               placeholder="Full name"
               onChange={(e) =>
@@ -39,7 +66,7 @@ const AddAddress = () => {
               value={address.fullName}
             />
             <input
-              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-gray-500"
+              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-[#E6E9F2]/80"
               type="text"
               placeholder="Phone number"
               onChange={(e) =>
@@ -48,7 +75,7 @@ const AddAddress = () => {
               value={address.phoneNumber}
             />
             <input
-              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-gray-500"
+              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-[#E6E9F2]/80"
               type="text"
               placeholder="Pin code"
               onChange={(e) =>
@@ -57,7 +84,7 @@ const AddAddress = () => {
               value={address.pincode}
             />
             <textarea
-              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-gray-500 resize-none"
+              className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-[#E6E9F2]/80 resize-none"
               type="text"
               rows={4}
               placeholder="Address (Area and Street)"
@@ -66,7 +93,7 @@ const AddAddress = () => {
             ></textarea>
             <div className="flex space-x-3">
               <input
-                className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-gray-500"
+                className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-[#E6E9F2]/80"
                 type="text"
                 placeholder="City/District/Town"
                 onChange={(e) =>
@@ -75,7 +102,7 @@ const AddAddress = () => {
                 value={address.city}
               />
               <input
-                className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-gray-500"
+                className="px-2 py-2.5 focus:border-orange-500 transition border border-[#E6E9F2]/60 rounded outline-none w-full text-[#E6E9F2]/80"
                 type="text"
                 placeholder="State"
                 onChange={(e) =>
@@ -87,7 +114,7 @@ const AddAddress = () => {
           </div>
           <button
             type="submit"
-            className="max-w-sm w-full mt-6 bg-orange-600 text-white py-3 hover:bg-orange-700 uppercase"
+            className="max-w-sm w-full mt-6 bg-orange-600 text-white cursor-pointer py-3 hover:bg-orange-700 uppercase"
           >
             Save address
           </button>
