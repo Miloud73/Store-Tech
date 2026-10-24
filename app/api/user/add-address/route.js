@@ -18,6 +18,9 @@ export async function POST(request) {
 
     const { address } = await request.json();
 
+    console.log("Add address route reached");
+    console.log("Authenticated user exists:", Boolean(userId));
+    console.log("Address fields:", Object.keys(address ?? {}));
     const newAddress = await Address.create({
       ...address,
       userId,

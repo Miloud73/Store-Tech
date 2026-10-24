@@ -20,7 +20,7 @@ export async function GET() {
     let user = await User.findById(userId);
 
     if (!user) {
-      console.log("MongoDB user missing; syncing from Clerk:", userId);
+      // console.log("MongoDB user missing; syncing from Clerk:", userId);
 
       // Fetch the authenticated user's profile from Clerk
       const client = await clerkClient();
@@ -29,8 +29,7 @@ export async function GET() {
       const email =
         clerkUser.emailAddresses.find(
           (item) => item.id === clerkUser.primaryEmailAddressId
-        )?.emailAddress ||
-        clerkUser.emailAddresses[0]?.emailAddress;
+        )?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress;
 
       if (!email) {
         return NextResponse.json(
@@ -41,10 +40,7 @@ export async function GET() {
 
       const userData = {
         _id: clerkUser.id,
-        name:
-          clerkUser.fullName ||
-          clerkUser.username ||
-          "User",
+        name: clerkUser.fullName || clerkUser.username || "User",
         email,
         imageUrl: clerkUser.imageUrl || "",
       };
@@ -56,12 +52,18 @@ export async function GET() {
         { upsert: true, new: true, setDefaultsOnInsert: true }
       );
 
-      console.log("MongoDB user synchronized:", user._id);
+      // console.log("MongoDB user synchronized:", user._id);
     }
 
     return NextResponse.json({
       success: true,
-      user,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        imageUrl: user.imageUrl,
+        cartItem: user.cartItem,
+      },
     });
   } catch (error) {
     console.error("GET /api/user/data failed:", error);
