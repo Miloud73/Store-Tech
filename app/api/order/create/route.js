@@ -16,7 +16,7 @@ export async function POST(request){
         }
         
         const amount = await items.reduce((total, item) => {
-            const product = await Product.findById(item.productId);
+            const product =  Product.findById(item.productId);
             if (!product) {
                 throw new Error(`Product with ID ${item.productId} not found`);
             }
