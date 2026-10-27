@@ -30,8 +30,8 @@ const OrderSummary = () => {
       });
 
       if (data.success) {
-        setUserAddresses(data.addresses);
-        if (data.addresses.length > 0) {
+        setUserAddresses(Array.isArray(data.addresses) ? data.addresses : []);
+        if (Array.isArray(data.addresses) && data.addresses.length > 0) {
           setSelectedAddress(data.addresses[0]);
         }
       } else {
@@ -42,8 +42,8 @@ const OrderSummary = () => {
     }
   }, [getToken]);
 
-  const handleAddressSelect = (address) => {
-    setSelectedAddress(address);
+  const handleAddressSelect = (addresses) => {
+    setSelectedAddress(addresses);
     setIsDropdownOpen(false);
   };
 
@@ -99,14 +99,14 @@ const OrderSummary = () => {
 
             {isDropdownOpen && (
               <ul className="absolute w-full bg-white border shadow-md mt-1 z-10 py-1.5">
-                {userAddresses.map((address, index) => (
+                {(userAddresses || []).map((addresses, index) => (
                   <li
                     key={index}
                     className="px-4 py-2 text-[#1d1d1b] cursor-pointer"
-                    onClick={() => handleAddressSelect(address)}
+                    onClick={() => handleAddressSelect(addresses)}
                   >
-                    {address.fullName}, {address.area}, {address.city},{" "}
-                    {address.state}
+                    {addresses.fullName}, {addresses.area}, {addresses.city},{" "}
+                    {addresses.state}
                   </li>
                 ))}
                 <li
