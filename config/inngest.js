@@ -90,6 +90,6 @@ export const createUserOrder = inngest.createFunction(
     });
     await connectDB();
     await Order.insertMany(orders);
-    return NextResponse.json({ success: true, processed: orders.length }, { status: 200 });
+    return { success: true, processed: orders.length }, { status: 200 };
   }
 );

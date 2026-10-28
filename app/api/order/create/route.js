@@ -4,7 +4,7 @@ import Order from "@/models/Order";
 import Product from "@/models/Product";
 import User from "@/models/User";
 import { NextResponse } from "next/server";
-import { inngest } from "../../../../config/inngest";
+import { inngest } from "@/config/inngest";
 
 export async function POST(request){
     try{
