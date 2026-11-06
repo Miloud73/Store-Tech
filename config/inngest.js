@@ -75,8 +75,8 @@ export const createUserOrder = inngest.createFunction(
       maxSize: 5,
       timeout: "5s",
     },
+    triggers: [{ event: "order/created" }],
   },
-  { event: "order/created" },
   async ({ events }) => {
     const orders = events.map((event) => ({
       userId: event.data.userId,
