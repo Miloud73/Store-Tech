@@ -93,5 +93,5 @@ export const createUserOrder = inngest.createFunction(
       success: true,
       processed: orders.length,
     };
-  },
+  }
 );
