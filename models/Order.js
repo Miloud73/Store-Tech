@@ -19,12 +19,17 @@ const orderSchema = new mongoose.Schema({
                 required: true,
                 min: 1,
             },
-            amount: {
+            
+        },
+    ],
+    amount: {
                 type: Number,
+                
                 required: true,
             },
             address: {
                 type: String,
+                
                 required: true,
             },
             status: {
@@ -33,11 +38,9 @@ const orderSchema = new mongoose.Schema({
                 default: "Order placed",
             },
             date: {
-                type: Date,
-                default: Date.now,
+                type: Number,
+                required: true,
             },
-        },
-    ],
 });
 
 export default mongoose.model("order", orderSchema);

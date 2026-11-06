@@ -71,12 +71,13 @@ export const syncUserDeletion = inngest.createFunction(
 export const createUserOrder = inngest.createFunction(
   {
     id: "create-user-order",
-    triggers: [{ event: "order/created" }],
+    // triggers: [],
     batchEvents: {
       maxSize: 5,
       timeout: "5s",
     },
   },
+  { event: "order/created" },
   async ({ events }) => {
     const orders = events.map((event) => ({
       userId: event.data.userId,
