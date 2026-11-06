@@ -1,4 +1,4 @@
-import { addressDummyData } from "@/assets/assets";
+"use client";
 import { useAppContext } from "@/context/AppContext";
 import axios from "axios";
 import React, { useCallback, useEffect, useState } from "react";
@@ -13,7 +13,7 @@ const OrderSummary = () => {
     getToken,
     user,
     cartItems,
-    setCartItemsc,
+    setCartItems,
   } = useAppContext();
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -47,7 +47,56 @@ const OrderSummary = () => {
     setIsDropdownOpen(false);
   };
 
-  const createOrder = async () => {};
+  const createOrder = async () => {
+    try {
+      if (!selectedAddress) {
+        return toast.error("Please select an address");
+      }
+      let cartItemsArray = Object.keys(cartItems).map((key) => ({
+        product: key,
+        quantity: cartItems[key],
+      }));
+      cartItemsArray = cartItemsArray.filter((item) => item.quantity > 0);
+
+      if (cartItemsArray.length === 0) {
+        return toast.error("Your cart is empty");
+      }
+
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        "/api/order/create",
+        {
+          address: selectedAddress._id,
+          items: cartItemsArray,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setCartItems({});
+        router.push("/order-placed");
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.error("Place order error:", error);
+      console.error("API response:", error.response?.data);
+
+      const message =
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        error.message ||
+        "Something went wrong while placing your order.";
+
+      toast.error(message);
+    }
+  };
 
   useEffect(() => {
     if (user) {

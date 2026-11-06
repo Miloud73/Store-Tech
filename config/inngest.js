@@ -15,19 +15,42 @@ export const synUserCreation = inngest.createFunction(
     },
   },
   async ({ event }) => {
-    const { id, first_name, last_name, email_addresses, image_url } =
-      event.data;
+    const {
+      id,
+      first_name,
+      last_name,
+      email_addresses,
+      image_url,
+    } = event.data;
 
-    const userData = {
-      _id: id,
-      email: email_addresses[0].email_address,
-      name: `${first_name} ${last_name}`,
-      imageUrl: image_url,
-    };
+    const email = email_addresses?.[0]?.email_address;
+
+    if (!id || !email) {
+      throw new Error("Clerk user ID or email is missing");
+    }
 
     await connectDB();
-    await User.create(userData);
-  },
+
+    await User.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          name: [first_name, last_name].filter(Boolean).join(" ") || "User",
+          email,
+          imageUrl: image_url || "",
+        },
+        $setOnInsert: {
+          _id: id,
+          cartItem: {},
+        },
+      },
+      {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      }
+    );
+  }
 );
 
 export const syncUserUpdation = inngest.createFunction(
